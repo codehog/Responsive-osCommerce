@@ -13,12 +13,15 @@
   class ot_total {
     var $title, $output;
 
-    function ot_total() {
+    function __construct() {
       $this->code = 'ot_total';
       $this->title = MODULE_ORDER_TOTAL_TOTAL_TITLE;
       $this->description = MODULE_ORDER_TOTAL_TOTAL_DESCRIPTION;
-      $this->enabled = ((MODULE_ORDER_TOTAL_TOTAL_STATUS == 'true') ? true : false);
-      $this->sort_order = MODULE_ORDER_TOTAL_TOTAL_SORT_ORDER;
+      
+      if ( defined('MODULE_ORDER_TOTAL_TOTAL_STATUS') ) {
+        $this->enabled = ((MODULE_ORDER_TOTAL_TOTAL_STATUS == 'true') ? true : false);
+        $this->sort_order = MODULE_ORDER_TOTAL_TOTAL_SORT_ORDER;
+      }
 
       $this->output = array();
     }

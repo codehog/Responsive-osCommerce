@@ -15,7 +15,7 @@
     var $_user_id;
     var $_user_name;
 
-    function actionRecorder($module, $user_id = null, $user_name = null) {
+    function __construct($module, $user_id = null, $user_name = null) {
       global $language, $PHP_SELF;
 
       $module = tep_sanitize_string(str_replace(' ', '', $module));
@@ -23,9 +23,9 @@
       if (defined('MODULE_ACTION_RECORDER_INSTALLED') && tep_not_null(MODULE_ACTION_RECORDER_INSTALLED)) {
         if (tep_not_null($module) && in_array($module . '.' . substr($PHP_SELF, (strrpos($PHP_SELF, '.')+1)), explode(';', MODULE_ACTION_RECORDER_INSTALLED))) {
           if (!class_exists($module)) {
-            if (file_exists(DIR_WS_MODULES . 'action_recorder/' . $module . '.' . substr($PHP_SELF, (strrpos($PHP_SELF, '.')+1)))) {
-              include(DIR_WS_LANGUAGES . $language . '/modules/action_recorder/' . $module . '.' . substr($PHP_SELF, (strrpos($PHP_SELF, '.')+1)));
-              include(DIR_WS_MODULES . 'action_recorder/' . $module . '.' . substr($PHP_SELF, (strrpos($PHP_SELF, '.')+1)));
+            if (file_exists('includes/modules/action_recorder/' . $module . '.' . substr($PHP_SELF, (strrpos($PHP_SELF, '.')+1)))) {
+              include('includes/languages/' . $language . '/modules/action_recorder/' . $module . '.' . substr($PHP_SELF, (strrpos($PHP_SELF, '.')+1)));
+              include('includes/modules/action_recorder/' . $module . '.' . substr($PHP_SELF, (strrpos($PHP_SELF, '.')+1)));
             } else {
               return false;
             }

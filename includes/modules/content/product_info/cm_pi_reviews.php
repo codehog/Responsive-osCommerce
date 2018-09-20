@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function cm_pi_reviews() {
+    function __construct() {
       $this->code = get_class($this);
       $this->group = basename(dirname(__FILE__));
 
@@ -33,7 +33,7 @@
     }
 
     function execute() {
-      global $oscTemplate, $_GET, $languages_id;
+      global $oscTemplate, $languages_id;
       
       $content_width = (int)MODULE_CONTENT_PRODUCT_INFO_REVIEWS_CONTENT_WIDTH;
 
@@ -50,7 +50,7 @@
         }
         
         ob_start();
-        include(DIR_WS_MODULES . 'content/' . $this->group . '/templates/reviews.php');
+        include('includes/modules/content/' . $this->group . '/templates/tpl_' . basename(__FILE__));
         $template = ob_get_clean();
 
         $oscTemplate->addContent($template, $this->group);

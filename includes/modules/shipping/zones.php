@@ -98,14 +98,17 @@
     var $code, $title, $description, $enabled, $num_zones;
 
 // class constructor
-    function zones() {
+    function __construct() {
       $this->code = 'zones';
       $this->title = MODULE_SHIPPING_ZONES_TEXT_TITLE;
       $this->description = MODULE_SHIPPING_ZONES_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_SHIPPING_ZONES_SORT_ORDER;
-      $this->icon = '';
-      $this->tax_class = MODULE_SHIPPING_ZONES_TAX_CLASS;
-      $this->enabled = ((MODULE_SHIPPING_ZONES_STATUS == 'True') ? true : false);
+      
+      if ( defined('MODULE_SHIPPING_ZONES_STATUS') ) {
+        $this->sort_order = MODULE_SHIPPING_ZONES_SORT_ORDER;
+        $this->icon = '';
+        $this->tax_class = MODULE_SHIPPING_ZONES_TAX_CLASS;
+        $this->enabled = ((MODULE_SHIPPING_ZONES_STATUS == 'True') ? true : false);
+      }
 
       // CUSTOMIZE THIS SETTING FOR THE NUMBER OF ZONES NEEDED
       $this->num_zones = 1;
@@ -162,7 +165,7 @@
         $this->quotes['tax'] = tep_get_tax_rate($this->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
       }
 
-      if (tep_not_null($this->icon)) $this->quotes['icon'] = tep_image($this->icon, $this->title);
+      if (tep_not_null($this->icon)) $this->quotes['icon'] = tep_image($this->icon, htmlspecialchars($this->title));
 
       if ($error == true) $this->quotes['error'] = MODULE_SHIPPING_ZONES_INVALID_ZONE;
 

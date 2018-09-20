@@ -13,12 +13,15 @@
   class ot_subtotal {
     var $title, $output;
 
-    function ot_subtotal() {
+    function __construct() {
       $this->code = 'ot_subtotal';
       $this->title = MODULE_ORDER_TOTAL_SUBTOTAL_TITLE;
       $this->description = MODULE_ORDER_TOTAL_SUBTOTAL_DESCRIPTION;
-      $this->enabled = ((MODULE_ORDER_TOTAL_SUBTOTAL_STATUS == 'true') ? true : false);
-      $this->sort_order = MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER;
+      
+      if ( defined('MODULE_ORDER_TOTAL_SUBTOTAL_STATUS') ) {
+        $this->enabled = ((MODULE_ORDER_TOTAL_SUBTOTAL_STATUS == 'true') ? true : false);
+        $this->sort_order = MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER;
+      }
 
       $this->output = array();
     }

@@ -14,16 +14,19 @@
     var $code, $title, $description, $icon, $enabled;
 
 // class constructor
-    function item() {
+    function __construct() {
       global $order;
 
       $this->code = 'item';
       $this->title = MODULE_SHIPPING_ITEM_TEXT_TITLE;
       $this->description = MODULE_SHIPPING_ITEM_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_SHIPPING_ITEM_SORT_ORDER;
-      $this->icon = '';
-      $this->tax_class = MODULE_SHIPPING_ITEM_TAX_CLASS;
-      $this->enabled = ((MODULE_SHIPPING_ITEM_STATUS == 'True') ? true : false);
+      
+      if ( defined('MODULE_SHIPPING_ITEM_STATUS') ) {
+        $this->sort_order = MODULE_SHIPPING_ITEM_SORT_ORDER;
+        $this->icon = '';
+        $this->tax_class = MODULE_SHIPPING_ITEM_TAX_CLASS;
+        $this->enabled = ((MODULE_SHIPPING_ITEM_STATUS == 'True') ? true : false);
+      }
 
       if ( ($this->enabled == true) && ((int)MODULE_SHIPPING_ITEM_ZONE > 0) ) {
         $check_flag = false;
@@ -60,7 +63,7 @@
         $this->quotes['tax'] = tep_get_tax_rate($this->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
       }
 
-      if (tep_not_null($this->icon)) $this->quotes['icon'] = tep_image($this->icon, $this->title);
+      if (tep_not_null($this->icon)) $this->quotes['icon'] = tep_image($this->icon, htmlspecialchars($this->title));
 
       return $this->quotes;
     }
@@ -102,8 +105,7 @@
           $number_of_items += $order->products[$i]['qty'];
 
           if (isset($order->products[$i]['attributes'])) {
-            reset($order->products[$i]['attributes']);
-            while (list($option, $value) = each($order->products[$i]['attributes'])) {
+            foreach($order->products[$i]['attributes'] as $option => $value) {
               $virtual_check_query = tep_db_query("select count(*) as total from " . TABLE_PRODUCTS_ATTRIBUTES . " pa, " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad where pa.products_id = '" . (int)$order->products[$i]['id'] . "' and pa.options_values_id = '" . (int)$value['value_id'] . "' and pa.products_attributes_id = pad.products_attributes_id");
               $virtual_check = tep_db_fetch_array($virtual_check_query);
 

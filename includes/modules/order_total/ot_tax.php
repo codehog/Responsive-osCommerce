@@ -13,12 +13,15 @@
   class ot_tax {
     var $title, $output;
 
-    function ot_tax() {
+    function __construct() {
       $this->code = 'ot_tax';
       $this->title = MODULE_ORDER_TOTAL_TAX_TITLE;
       $this->description = MODULE_ORDER_TOTAL_TAX_DESCRIPTION;
-      $this->enabled = ((MODULE_ORDER_TOTAL_TAX_STATUS == 'true') ? true : false);
-      $this->sort_order = MODULE_ORDER_TOTAL_TAX_SORT_ORDER;
+      
+      if ( defined('MODULE_ORDER_TOTAL_TAX_STATUS') ) {
+        $this->enabled = ((MODULE_ORDER_TOTAL_TAX_STATUS == 'true') ? true : false);
+        $this->sort_order = MODULE_ORDER_TOTAL_TAX_SORT_ORDER;
+      }
 
       $this->output = array();
     }
@@ -26,8 +29,7 @@
     function process() {
       global $order, $currencies;
 
-      reset($order->info['tax_groups']);
-      while (list($key, $value) = each($order->info['tax_groups'])) {
+      foreach($order->info['tax_groups'] as $key => $value) {
         if ($value > 0) {
           $this->output[] = array('title' => $key . ':',
                                   'text' => $currencies->format($value, true, $order->info['currency'], $order->info['currency_value']),

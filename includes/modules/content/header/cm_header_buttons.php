@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function cm_header_buttons() {
+    function __construct() {
       $this->code = get_class($this);
       $this->group = basename(dirname(__FILE__));
 
@@ -38,7 +38,7 @@
       $content_width = (int)MODULE_CONTENT_HEADER_BUTTONS_CONTENT_WIDTH;
       
       ob_start();
-      include(DIR_WS_MODULES . 'content/' . $this->group . '/templates/buttons.php');
+      include('includes/modules/content/' . $this->group . '/templates/tpl_' . basename(__FILE__));
       $template = ob_get_clean();
 
       $oscTemplate->addContent($template, $this->group);

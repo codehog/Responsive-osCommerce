@@ -14,31 +14,26 @@ class inpay
     var $code, $title, $description, $enabled;
 
     // class constructor
-    function inpay()
-    {
-        global $order;
-        $this->signature = 'inpay|inpay|1.0|2.2';
-        $this->code = 'inpay';
-        $this->title = MODULE_PAYMENT_INPAY_TEXT_TITLE;
-        $this->public_title = MODULE_PAYMENT_INPAY_TEXT_PUBLIC_TITLE;
-        $this->description = MODULE_PAYMENT_INPAY_TEXT_DESCRIPTION;
+    function __construct() {
+      global $order;
+      $this->signature = 'inpay|inpay|1.0|2.2';
+      $this->code = 'inpay';
+      $this->title = MODULE_PAYMENT_INPAY_TEXT_TITLE;
+      $this->public_title = MODULE_PAYMENT_INPAY_TEXT_PUBLIC_TITLE;
+      $this->description = MODULE_PAYMENT_INPAY_TEXT_DESCRIPTION;
+      
+      if ( defined('MODULE_PAYMENT_INPAY_STATUS') ) {
         $this->sort_order = MODULE_PAYMENT_INPAY_SORT_ORDER;
         $this->enabled = ((MODULE_PAYMENT_INPAY_STATUS == 'True')?true:false);
 
-        //        if ((int)MODULE_PAYMENT_INPAY_PREPARE_ORDER_STATUS_ID > 0)
-        //        {
-        //            $this->order_status = MODULE_PAYMENT_INPAY_PREPARE_ORDER_STATUS_ID;
-        //        }
-
         if (is_object($order))$this->update_status();
 
-        if (MODULE_PAYMENT_INPAY_GATEWAY_SERVER == 'Production')
-        {
-            $this->form_action_url = 'https://secure.inpay.com';
-        } else
-        {
-            $this->form_action_url = 'https://test-secure.inpay.com';
+        if (MODULE_PAYMENT_INPAY_GATEWAY_SERVER == 'Production') {
+          $this->form_action_url = 'https://secure.inpay.com';
+        } else {
+          $this->form_action_url = 'https://test-secure.inpay.com';
         }
+      }
     }
 
     // class methods
@@ -158,8 +153,7 @@ class inpay
                 $order_totals = array ();
                 if (is_array($order_total_modules->modules))
                 {
-                    reset($order_total_modules->modules);
-                    while ( list (, $value) = each($order_total_modules->modules))
+                    foreach ($order_total_modules->modules as $value)
                     {
                         $class = substr($value, 0, strrpos($value, '.'));
                         if ($GLOBALS[$class]->enabled)
@@ -323,8 +317,8 @@ class inpay
         'custom'=>$customer_id,
         'no_note'=>'1',
         'notify_url'=>tep_href_link('ext/modules/payment/inpay/pb_handler.php', '', 'SSL', false, false),
-        'return_url'=>tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
-        'cancel_url'=>tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
+        'return_url'=>tep_href_link('checkout_process.php', '', 'SSL'),
+        'cancel_url'=>tep_href_link('checkout_payment.php', '', 'SSL'),
         'bn'=>'osCommerce22_Default_ST',
         'buyer_email'=>$order->customer['email_address'],
         'merchant_id'=>MODULE_PAYMENT_INPAY_MERCHANT_ID,
@@ -366,8 +360,7 @@ class inpay
         // calc Md5 sum
         //
         $parameters['checksum'] = $this->calcInpayMd5Key($parameters);
-        reset($parameters);
-        while ( list ($key, $value) = each($parameters))
+        foreach ($parameters as $key => $value)
         {
             $process_button_string .= tep_draw_hidden_field($key, $value);
         }
@@ -379,7 +372,7 @@ class inpay
         global $customer_id, $order, $order_totals, $sendto, $billto, $languages_id, $payment, $currencies, $cart, $cart_inpay_Standard_ID;
         global $$payment;
         $order_id = substr($cart_inpay_Standard_ID, strpos($cart_inpay_Standard_ID, '-')+1);
-        $my_status_query = tep_db_query("select orders_status from ".TABLE_ORDERS." where orders_id = '".$order_id."'"); // TODO: fix PB to add all params"' and customers_id = '" . (int)$HTTP_POST_VARS['custom'] . "'");
+        $my_status_query = tep_db_query("select orders_status from ".TABLE_ORDERS." where orders_id = '".$order_id."'"); // TODO: fix PB to add all params"' and customers_id = '" . (int)$_POST['custom'] . "'");
         $current_status_id = 0;
         $delivered_status = 3;
         $update_status = true;
@@ -501,7 +494,7 @@ class inpay
         $email_order = STORE_NAME."\n".
         EMAIL_SEPARATOR."\n".
         EMAIL_TEXT_ORDER_NUMBER.' '.$order_id."\n".
-        EMAIL_TEXT_INVOICE_URL.' '.tep_href_link(FILENAME_ACCOUNT_HISTORY_INFO, 'order_id='.$order_id, 'SSL', false)."\n".
+        EMAIL_TEXT_INVOICE_URL.' '.tep_href_link('account_history_info.php', 'order_id='.$order_id, 'SSL', false)."\n".
         EMAIL_TEXT_DATE_ORDERED.' '.strftime(DATE_FORMAT_LONG)."\n\n";
         if ($order->info['comments'])
         {
@@ -565,7 +558,7 @@ class inpay
 
         tep_session_unregister('cart_inpay_Standard_ID');
 
-        tep_redirect(tep_href_link(FILENAME_CHECKOUT_SUCCESS, '', 'SSL'));
+        tep_redirect(tep_href_link('checkout_success.php', '', 'SSL'));
     }
 
     function after_process()

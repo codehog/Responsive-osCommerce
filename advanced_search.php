@@ -12,11 +12,11 @@
 
   require('includes/application_top.php');
 
-  require(DIR_WS_LANGUAGES . $language . '/' . FILENAME_ADVANCED_SEARCH);
+  require('includes/languages/' . $language . '/advanced_search.php');
 
-  $breadcrumb->add(NAVBAR_TITLE_1, tep_href_link(FILENAME_ADVANCED_SEARCH));
+  $breadcrumb->add(NAVBAR_TITLE_1, tep_href_link('advanced_search.php'));
 
-  require(DIR_WS_INCLUDES . 'template_top.php');
+  require('includes/template_top.php');
 ?>
 
 <script src="includes/general.js"></script>
@@ -104,7 +104,7 @@ function check_form() {
 //--></script>
 
 <div class="page-header">
-  <h1><?php echo HEADING_TITLE_1; ?></h1>
+  <h1 class="h3"><?php echo HEADING_TITLE_1; ?></h1>
 </div>
 
 <?php
@@ -113,7 +113,7 @@ function check_form() {
   }
 ?>
 
-<?php echo tep_draw_form('advanced_search', tep_href_link(FILENAME_ADVANCED_SEARCH_RESULT, '', 'NONSSL', false), 'get', 'class="form-horizontal" onsubmit="return check_form(this);"') . tep_hide_session_id(); ?>
+<?php echo tep_draw_form('advanced_search', tep_href_link('advanced_search_result.php', '', 'NONSSL', false), 'get', 'class="form-horizontal" onsubmit="return check_form(this);"') . tep_hide_session_id(); ?>
 
 <div class="contentContainer">
 
@@ -138,8 +138,8 @@ function check_form() {
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fa fa-remove"></span></button>
-            <h4 class="modal-title"><?php echo HEADING_SEARCH_HELP; ?></h4>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times"></span></button>
+            <h4 class="h3 modal-title"><?php echo HEADING_SEARCH_HELP; ?></h4>
           </div>
           <div class="modal-body">
             <p><?php echo TEXT_SEARCH_HELP; ?></p>
@@ -180,7 +180,7 @@ function check_form() {
       <label for="PriceFrom" class="control-label col-sm-3"><?php echo ENTRY_PRICE_FROM; ?></label>
       <div class="col-sm-9">
         <?php
-        echo tep_draw_input_field('pfrom', '', 'id="PriceFrom" placeholder="' . ENTRY_PRICE_FROM . '"');
+        echo tep_draw_input_field('pfrom', '', 'id="PriceFrom" placeholder="' . ENTRY_PRICE_FROM_TEXT . '"');
         ?>
       </div>
     </div>
@@ -188,7 +188,7 @@ function check_form() {
       <label for="PriceTo" class="control-label col-sm-3"><?php echo ENTRY_PRICE_TO; ?></label>
       <div class="col-sm-9">
         <?php
-        echo tep_draw_input_field('pto', '', 'id="PriceTo" placeholder="' . ENTRY_PRICE_TO . '"');
+        echo tep_draw_input_field('pto', '', 'id="PriceTo" placeholder="' . ENTRY_PRICE_TO_TEXT . '"');
         ?>
       </div>
     </div>
@@ -196,7 +196,7 @@ function check_form() {
       <label for="dfrom" class="control-label col-sm-3"><?php echo ENTRY_DATE_FROM; ?></label>
       <div class="col-sm-9">
         <?php
-        echo tep_draw_input_field('dfrom', '', 'id="dfrom" placeholder="' . ENTRY_DATE_FROM . '"');
+        echo tep_draw_input_field('dfrom', '', 'id="dfrom" placeholder="' . ENTRY_DATE_FROM_TEXT . '"');
         ?>
       </div>
     </div>
@@ -204,7 +204,7 @@ function check_form() {
       <label for="dto" class="control-label col-sm-3"><?php echo ENTRY_DATE_TO; ?></label>
       <div class="col-sm-9">
         <?php
-        echo tep_draw_input_field('dto', '', 'id="dto" placeholder="' . ENTRY_DATE_TO . '"');
+        echo tep_draw_input_field('dto', '', 'id="dto" placeholder="' . ENTRY_DATE_TO_TEXT . '"');
         ?>
       </div>
     </div>
@@ -215,6 +215,6 @@ function check_form() {
 </form>
 
 <?php
-  require(DIR_WS_INCLUDES . 'template_bottom.php');
-  require(DIR_WS_INCLUDES . 'application_bottom.php');
+  require('includes/template_bottom.php');
+  require('includes/application_bottom.php');
 ?>

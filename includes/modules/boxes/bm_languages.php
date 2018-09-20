@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function bm_languages() {
+    function __construct() {
       $this->title = MODULE_BOXES_LANGUAGES_TITLE;
       $this->description = MODULE_BOXES_LANGUAGES_DESCRIPTION;
 
@@ -35,19 +35,18 @@
 
       if (substr(basename($PHP_SELF), 0, 8) != 'checkout') {
         if (!isset($lng) || (isset($lng) && !is_object($lng))) {
-          include(DIR_WS_CLASSES . 'language.php');
+          include('includes/classes/language.php');
           $lng = new language;
         }
 
         if (count($lng->catalog_languages) > 1) {
           $languages_string = '';
-          reset($lng->catalog_languages);
-          while (list($key, $value) = each($lng->catalog_languages)) {
-            $languages_string .= ' <a href="' . tep_href_link($PHP_SELF, tep_get_all_get_params(array('language', 'currency')) . 'language=' . $key, $request_type) . '">' .tep_image(DIR_WS_LANGUAGES .  $value['directory'] . '/images/' . $value['image'], $value['name'], NULL, NULL, NULL, false) . '</a> ';
+          foreach($lng->catalog_languages as $key => $value) {
+            $languages_string .= ' <a href="' . tep_href_link($PHP_SELF, tep_get_all_get_params(array('language', 'currency')) . 'language=' . $key, $request_type) . '">' .tep_image('includes/languages/' .  $value['directory'] . '/images/' . $value['image'], htmlspecialchars($value['name']), NULL, NULL, NULL, false) . '</a> ';
           }
                   
           ob_start();
-          include(DIR_WS_MODULES . 'boxes/templates/languages.php');
+          include('includes/modules/boxes/templates/tpl_' . basename(__FILE__));
           $data = ob_get_clean();
 
           $oscTemplate->addBlock($data, $this->group);

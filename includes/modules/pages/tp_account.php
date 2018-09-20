@@ -19,27 +19,27 @@
       $oscTemplate->_data[$this->group] = array('account' => array('title' => MY_ACCOUNT_TITLE,
                                                                    'sort_order' => 10,
                                                                    'links' => array('edit' => array('title' => MY_ACCOUNT_INFORMATION,
-                                                                                                    'link' => tep_href_link(FILENAME_ACCOUNT_EDIT, '', 'SSL'),
+                                                                                                    'link' => tep_href_link('account_edit.php', '', 'SSL'),
                                                                                                     'icon' => 'fa fa-user'),
                                                                                     'address_book' => array('title' => MY_ACCOUNT_ADDRESS_BOOK,
-                                                                                                            'link' => tep_href_link(FILENAME_ADDRESS_BOOK, '', 'SSL'),
+                                                                                                            'link' => tep_href_link('address_book.php', '', 'SSL'),
                                                                                                             'icon' => 'fa fa-home'),
                                                                                     'password' => array('title' => MY_ACCOUNT_PASSWORD,
-                                                                                                        'link' => tep_href_link(FILENAME_ACCOUNT_PASSWORD, '', 'SSL'),
+                                                                                                        'link' => tep_href_link('account_password.php', '', 'SSL'),
                                                                                                         'icon' => 'fa fa-cog'))),
                                                 'orders' => array('title' => MY_ORDERS_TITLE,
                                                                   'sort_order' => 20,
                                                                   'links' => array('history' => array('title' => MY_ORDERS_VIEW,
-                                                                                                      'link' => tep_href_link(FILENAME_ACCOUNT_HISTORY, '', 'SSL'),
+                                                                                                      'link' => tep_href_link('account_history.php', '', 'SSL'),
                                                                                                       'icon' => 'fa fa-shopping-cart'))),
                                                 'notifications' => array('title' => EMAIL_NOTIFICATIONS_TITLE,
                                                                          'sort_order' => 30,
                                                                          'links' => array('newsletters' => array('title' => EMAIL_NOTIFICATIONS_NEWSLETTERS,
-                                                                                                                 'link' => tep_href_link(FILENAME_ACCOUNT_NEWSLETTERS, '', 'SSL'),
+                                                                                                                 'link' => tep_href_link('account_newsletters.php', '', 'SSL'),
                                                                                                                  'icon' => 'fa fa-envelope'),
                                                                                           'products' => array('title' => EMAIL_NOTIFICATIONS_PRODUCTS,
-                                                                                                              'link' => tep_href_link(FILENAME_ACCOUNT_NOTIFICATIONS, '', 'SSL'),
-                                                                                                              'icon' => 'fa fa-send'))));
+                                                                                                              'link' => tep_href_link('account_notifications.php', '', 'SSL'),
+                                                                                                              'icon' => 'fas fa-paper-plane'))));
     }
 
     function build() {
@@ -53,9 +53,9 @@
       $output = '<div class="col-sm-12">';
 
       foreach ( $oscTemplate->_data[$this->group] as $group ) {
-        $output .= '<h2>' . $group['title'] . '</h2>' .
+        $output .= '<h2 class="h3">' . $group['title'] . '</h2>' .
                    '<div class="contentText">' .
-                   '  <ul class="accountLinkList">';
+                   '  <ul class="list-unstyled">';
 
         foreach ( $group['links'] as $entry ) {
           $output .= '    <li>';

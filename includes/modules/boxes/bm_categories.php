@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function bm_categories() {
+    function __construct() {
       $this->title = MODULE_BOXES_CATEGORIES_TITLE;
       $this->description = MODULE_BOXES_CATEGORIES_DESCRIPTION;
 
@@ -42,7 +42,7 @@
       $category_tree = $OSCOM_CategoryTree->getTree();
       
       ob_start();
-      include(DIR_WS_MODULES . 'boxes/templates/categories.php');
+      include('includes/modules/boxes/templates/tpl_' . basename(__FILE__));
       $data = ob_get_clean();
 
       $oscTemplate->addBlock($data, $this->group);

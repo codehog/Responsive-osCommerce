@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function cm_cs_thank_you() {
+    function __construct() {
       $this->code = get_class($this);
       $this->group = basename(dirname(__FILE__));
 
@@ -35,7 +35,7 @@
       global $oscTemplate;
 
       ob_start();
-      include(DIR_WS_MODULES . 'content/' . $this->group . '/templates/thank_you.php');
+      include('includes/modules/content/' . $this->group . '/templates/tpl_' . basename(__FILE__));
       $template = ob_get_clean();
 
       $oscTemplate->addContent($template, $this->group);

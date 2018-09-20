@@ -17,7 +17,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function d_total_revenue() {
+    function __construct() {
       $this->title = MODULE_ADMIN_DASHBOARD_TOTAL_REVENUE_TITLE;
       $this->description = MODULE_ADMIN_DASHBOARD_TOTAL_REVENUE_DESCRIPTION;
 
@@ -50,7 +50,7 @@
       }
 
       $chart_label = tep_output_string(MODULE_ADMIN_DASHBOARD_TOTAL_REVENUE_CHART_LINK);
-      $chart_label_link = tep_href_link(FILENAME_ORDERS);
+      $chart_label_link = tep_href_link('orders.php');
 
       $output = <<<EOD
 <div id="d_total_revenue" style="width: 100%; height: 150px;"></div>

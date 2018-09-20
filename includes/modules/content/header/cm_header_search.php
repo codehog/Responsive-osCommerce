@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function cm_header_search() {
+    function __construct() {
       $this->code = get_class($this);
       $this->group = basename(dirname(__FILE__));
 
@@ -37,17 +37,19 @@
       
       $content_width = MODULE_CONTENT_HEADER_SEARCH_CONTENT_WIDTH;
 
-
-      $search_box = '<div class="searchbox-margin">';
-      $search_box .= tep_draw_form('quick_find', tep_href_link('advanced_search_result.php', '', $request_type, false), 'get', 'class="form-horizontal"');
-      $search_box .= '  <div class="input-group">' .
-                          tep_draw_input_field('keywords', '', 'required placeholder="' . TEXT_SEARCH_PLACEHOLDER . '"', 'search') . '<span class="input-group-btn"><button type="submit" class="btn btn-info"><i class="fa fa-search"></i></button></span>' .
-                      '  </div>';
-      $search_box .=  tep_hide_session_id() . '</form>';
-      $search_box .= '</div>';
+      $search_box = null;
+      $search_box .= '<div class="searchbox-margin">';
+        $search_box .= tep_draw_form('quick_find', tep_href_link('advanced_search_result.php', '', $request_type, false), 'get', 'class="form-horizontal"');
+        $search_box .= '<div class="input-group">';
+          $search_box .= tep_draw_input_field('keywords', '', 'required aria-required="true" aria-label="' . TEXT_SEARCH_PLACEHOLDER . '" placeholder="' . TEXT_SEARCH_PLACEHOLDER . '"', 'search');
+          $search_box .= '<span class="input-group-btn"><button type="submit" class="btn btn-info"><i class="fa fa-search"></i></button></span>';
+        $search_box .= '</div>';
+        $search_box .=  tep_hide_session_id();
+        $search_box .= '</form>' . PHP_EOL;
+      $search_box .= '</div>' . PHP_EOL;
 
       ob_start();
-      include(DIR_WS_MODULES . 'content/' . $this->group . '/templates/search.php');
+      include('includes/modules/content/' . $this->group . '/templates/tpl_' . basename(__FILE__));
       $template = ob_get_clean();
 
       $oscTemplate->addContent($template, $this->group);

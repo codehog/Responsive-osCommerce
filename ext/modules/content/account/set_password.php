@@ -29,11 +29,11 @@
   }
 
 // needs to be included earlier to set the success message in the messageStack
-  require(DIR_WS_LANGUAGES . $language . '/modules/content/account/cm_account_set_password.php');
+  require('includes/languages/' . $language . '/modules/content/account/cm_account_set_password.php');
 
-  if (isset($HTTP_POST_VARS['action']) && ($HTTP_POST_VARS['action'] == 'process') && isset($HTTP_POST_VARS['formid']) && ($HTTP_POST_VARS['formid'] == $sessiontoken)) {
-    $password_new = tep_db_prepare_input($HTTP_POST_VARS['password_new']);
-    $password_confirmation = tep_db_prepare_input($HTTP_POST_VARS['password_confirmation']);
+  if (isset($_POST['action']) && ($_POST['action'] == 'process') && isset($_POST['formid']) && ($_POST['formid'] == $sessiontoken)) {
+    $password_new = tep_db_prepare_input($_POST['password_new']);
+    $password_confirmation = tep_db_prepare_input($_POST['password_confirmation']);
 
     $error = false;
 
@@ -61,11 +61,11 @@
   $breadcrumb->add(MODULE_CONTENT_ACCOUNT_SET_PASSWORD_NAVBAR_TITLE_1, tep_href_link('account.php', '', 'SSL'));
   $breadcrumb->add(MODULE_CONTENT_ACCOUNT_SET_PASSWORD_NAVBAR_TITLE_2, tep_href_link('ext/modules/content/account/set_password.php', '', 'SSL'));
 
-  require(DIR_WS_INCLUDES . 'template_top.php');
+  require('includes/template_top.php');
 ?>
 
 <div class="page-header">
-  <h1><?php echo MODULE_CONTENT_ACCOUNT_SET_PASSWORD_HEADING_TITLE; ?></h1>
+  <h1 class="h3"><?php echo MODULE_CONTENT_ACCOUNT_SET_PASSWORD_HEADING_TITLE; ?></h1>
 </div>
 
 <?php
@@ -77,23 +77,21 @@
 <?php echo tep_draw_form('account_password', tep_href_link('ext/modules/content/account/set_password.php', '', 'SSL'), 'post', 'class="form-horizontal"', true) . tep_draw_hidden_field('action', 'process'); ?>
 
 <div class="contentContainer">
-  <p class="inputRequirement text-right"><?php echo FORM_REQUIRED_INFORMATION; ?></p>
+  <p class="text-danger text-right"><?php echo FORM_REQUIRED_INFORMATION; ?></p>
 
   <div class="contentText">
     <div class="form-group has-feedback">
-      <label for="inputNew" class="control-label col-sm-3"><?php echo ENTRY_PASSWORD_NEW; ?></label>
+      <label for="inputPassword" class="control-label col-sm-3"><?php echo ENTRY_PASSWORD_NEW; ?></label>
       <div class="col-sm-9">
-        <?php echo tep_draw_input_field('password_new', NULL, 'required aria-required="true" aria-describedby="atPasswordNew" autofocus="autofocus" id="inputNew" placeholder="' . ENTRY_PASSWORD_NEW . '"', 'password'); ?>
+        <?php echo tep_draw_input_field('password_new', NULL, 'required aria-required="true" autofocus="autofocus" id="inputPassword" autocomplete="new-password" placeholder="' . ENTRY_PASSWORD_NEW_TEXT . '"', 'password'); ?>
         <?php echo FORM_REQUIRED_INPUT; ?>
-        <?php if (tep_not_null(ENTRY_PASSWORD_NEW_TEXT)) echo '<span id="atPasswordNew" class="help-block">' . ENTRY_PASSWORD_NEW_TEXT . '</span>'; ?>
       </div>
     </div>
     <div class="form-group has-feedback">
       <label for="inputConfirmation" class="control-label col-sm-3"><?php echo ENTRY_PASSWORD_CONFIRMATION; ?></label>
       <div class="col-sm-9">
-        <?php echo tep_draw_input_field('password_confirmation', NULL, 'required aria-required="true" aria-describedby="atPasswordConfirmation" id="inputConfirmation" placeholder="' . ENTRY_PASSWORD_CONFIRMATION . '"', 'password'); ?>
+        <?php echo tep_draw_input_field('password_confirmation', NULL, 'required aria-required="true" id="inputConfirmation" autocomplete="new-password" placeholder="' . ENTRY_PASSWORD_CONFIRMATION_TEXT . '"', 'password'); ?>
         <?php echo FORM_REQUIRED_INPUT; ?>
-        <?php if (tep_not_null(ENTRY_PASSWORD_CONFIRMATION_TEXT)) echo '<span id="atPasswordConfirmation" class="help-block">' . ENTRY_PASSWORD_CONFIRMATION_TEXT . '</span>'; ?>
       </div>
     </div>
   </div>
@@ -107,6 +105,6 @@
 </form>
 
 <?php
-  require(DIR_WS_INCLUDES . 'template_bottom.php');
-  require(DIR_WS_INCLUDES . 'application_bottom.php');
+  require('includes/template_bottom.php');
+  require('includes/application_bottom.php');
 ?>

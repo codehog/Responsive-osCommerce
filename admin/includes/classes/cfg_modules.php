@@ -13,11 +13,11 @@
   class cfg_modules {
     var $_modules = array();
 
-    function cfg_modules() {
+    function __construct() {
       global $PHP_SELF, $language;
 
       $file_extension = substr($PHP_SELF, strrpos($PHP_SELF, '.'));
-      $directory = DIR_WS_MODULES . 'cfg_modules';
+      $directory = 'includes/modules/cfg_modules';
 
       if ($dir = @dir($directory)) {
         while ($file = $dir->read()) {
@@ -25,8 +25,8 @@
             if (substr($file, strrpos($file, '.')) == $file_extension) {
               $class = substr($file, 0, strrpos($file, '.'));
 
-              include(DIR_WS_LANGUAGES . $language . '/modules/cfg_modules/' . $file);
-              include(DIR_WS_MODULES . 'cfg_modules/' . $class . '.php');
+              include('includes/languages/' . $language . '/modules/cfg_modules/' . $file);
+              include('includes/modules/cfg_modules/' . $class . '.php');
 
               $m = new $class();
 

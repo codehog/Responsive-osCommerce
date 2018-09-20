@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function bm_card_acceptance() {
+    function __construct() {
       $this->title = MODULE_BOXES_CARD_ACCEPTANCE_TITLE;
       $this->description = MODULE_BOXES_CARD_ACCEPTANCE_DESCRIPTION;
 
@@ -37,11 +37,11 @@
         $output = NULL;
 
         foreach ( explode(';', MODULE_BOXES_CARD_ACCEPTANCE_LOGOS) as $logo ) {
-          $output .= tep_image(DIR_WS_IMAGES . 'card_acceptance/' . basename($logo), null, null, null, null, false);
+          $output .= tep_image('images/card_acceptance/' . basename($logo), null, null, null, null, false);
         }
                    
         ob_start();
-        include(DIR_WS_MODULES . 'boxes/templates/card_acceptance.php');
+        include('includes/modules/boxes/templates/tpl_' . basename(__FILE__));
         $data = ob_get_clean();
 
         $oscTemplate->addBlock($data, $this->group);
@@ -91,9 +91,9 @@
   function bm_card_acceptance_edit_logos($values, $key) {
     $files_array = array();
 
-    if ( $dir = @dir(DIR_FS_CATALOG . DIR_WS_IMAGES . 'card_acceptance') ) {
+    if ( $dir = @dir(DIR_FS_CATALOG . 'images/card_acceptance') ) {
       while ( $file = $dir->read() ) {
-        if ( !is_dir(DIR_FS_CATALOG . DIR_WS_IMAGES . 'card_acceptance/' . $file) ) {
+        if ( !is_dir(DIR_FS_CATALOG . 'images/card_acceptance/' . $file) ) {
           if ( in_array(substr($file, strrpos($file, '.')+1), array('gif', 'jpg', 'png')) ) {
             $files_array[] = $file;
           }
@@ -107,7 +107,7 @@
 
     $values_array = !empty($values) ? explode(';', $values) : array();
 
-    $output = '<h3>' . MODULE_BOXES_CARD_ACCEPTANCE_SHOWN_CARDS . '</h3>' .
+    $output = '<h3 class="h3">' . MODULE_BOXES_CARD_ACCEPTANCE_SHOWN_CARDS . '</h3>' .
               '<ul id="ca_logos" style="list-style-type: none; margin: 0; padding: 5px; margin-bottom: 10px;">';
 
     foreach ($values_array as $file) {
@@ -116,7 +116,7 @@
 
     $output .= '</ul>';
 
-    $output .= '<h3>' . MODULE_BOXES_CARD_ACCEPTANCE_NEW_CARDS . '</h3><ul id="new_ca_logos" style="list-style-type: none; margin: 0; padding: 5px; margin-bottom: 10px;">';
+    $output .= '<h3 class="h3">' . MODULE_BOXES_CARD_ACCEPTANCE_NEW_CARDS . '</h3><ul id="new_ca_logos" style="list-style-type: none; margin: 0; padding: 5px; margin-bottom: 10px;">';
 
     foreach ($files_array as $file) {
       if ( !in_array($file, $values_array) ) {

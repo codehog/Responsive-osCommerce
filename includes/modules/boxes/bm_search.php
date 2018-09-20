@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function bm_search() {
+    function __construct() {
       $this->title = MODULE_BOXES_SEARCH_TITLE;
       $this->description = MODULE_BOXES_SEARCH_DESCRIPTION;
 
@@ -33,7 +33,7 @@
     function execute() {
       global $request_type, $oscTemplate;
 
-      $form_output = '    ' . tep_draw_form('quick_find', tep_href_link(FILENAME_ADVANCED_SEARCH_RESULT, '', $request_type, false), 'get') .
+      $form_output = '    ' . tep_draw_form('quick_find', tep_href_link('advanced_search_result.php', '', $request_type, false), 'get') .
                      '    <div class="input-group">' .
                      '    ' . tep_draw_input_field('keywords', '', 'required placeholder="' . TEXT_SEARCH_PLACEHOLDER . '"', 'search') .
                      '      <span class="input-group-btn"><button type="submit" class="btn btn-search"><i class="fa fa-search"></i></button></span>' .
@@ -41,7 +41,7 @@
                      '    </form>';
               
       ob_start();
-      include(DIR_WS_MODULES . 'boxes/templates/search.php');
+      include('includes/modules/boxes/templates/tpl_' . basename(__FILE__));
       $data = ob_get_clean();
 
       $oscTemplate->addBlock($data, $this->group);

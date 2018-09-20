@@ -10,13 +10,13 @@
   Released under the GNU General Public License
 */
 
-  if (!strstr($PHP_SELF, FILENAME_ACCOUNT_HISTORY_INFO)) {
+  if (!strstr($PHP_SELF, 'account_history_info.php')) {
 // Get last order id for checkout_success
     $orders_query = tep_db_query("select orders_id from " . TABLE_ORDERS . " where customers_id = '" . (int)$customer_id . "' order by orders_id desc limit 1");
     $orders = tep_db_fetch_array($orders_query);
     $last_order = $orders['orders_id'];
   } else {
-    $last_order = $HTTP_GET_VARS['order_id'];
+    $last_order = $_GET['order_id'];
   }
 
 // Now get all downloadable products in that order
@@ -24,10 +24,10 @@
   if (tep_db_num_rows($downloads_query) > 0) {
 ?>
 
-  <h2><?php echo HEADING_DOWNLOAD; ?></h2>
+  <h2 class="h3"><?php echo HEADING_DOWNLOAD; ?></h2>
 
   <div class="contentText">
-    <table border="0" width="100%" cellspacing="1" cellpadding="2">
+    <table class="table table-striped">
 
 <?php
     while ($downloads = tep_db_fetch_array($downloads_query)) {
@@ -44,13 +44,13 @@
 // - No expiry date is enforced (maxdays == 0), OR
 // - The expiry date is not reached
       if ( ($downloads['download_count'] > 0) && (file_exists(DIR_FS_DOWNLOAD . $downloads['orders_products_filename'])) && ( ($downloads['download_maxdays'] == 0) || ($download_timestamp > time())) ) {
-        echo '        <td><a href="' . tep_href_link(FILENAME_DOWNLOAD, 'order=' . $last_order . '&id=' . $downloads['orders_products_download_id']) . '">' . $downloads['products_name'] . '</a></td>' . "\n";
+        echo '        <td><a href="' . tep_href_link('download.php', 'order=' . $last_order . '&id=' . $downloads['orders_products_download_id']) . '">' . $downloads['products_name'] . '</a></td>' . "\n";
       } else {
         echo '        <td>' . $downloads['products_name'] . '</td>' . "\n";
       }
 
       echo '        <td>' . TABLE_HEADING_DOWNLOAD_DATE . tep_date_long($download_expiry) . '</td>' . "\n" .
-           '        <td align="right">' . $downloads['download_count'] . TABLE_HEADING_DOWNLOAD_COUNT . '</td>' . "\n" .
+           '        <td class="text-right">' . $downloads['download_count'] . TABLE_HEADING_DOWNLOAD_COUNT . '</td>' . "\n" .
            '      </tr>' . "\n";
     }
 ?>
@@ -58,10 +58,10 @@
     </table>
 
 <?php
-    if (!strstr($PHP_SELF, FILENAME_ACCOUNT_HISTORY_INFO)) {
+    if (!strstr($PHP_SELF, 'account_history_info.php')) {
 ?>
 
-    <p><?php printf(FOOTER_DOWNLOAD, '<a href="' . tep_href_link(FILENAME_ACCOUNT, '', 'SSL') . '">' . HEADER_TITLE_MY_ACCOUNT . '</a>'); ?></p>
+    <p><?php printf(FOOTER_DOWNLOAD, '<a href="' . tep_href_link('account.php', '', 'SSL') . '">' . HEADER_TITLE_MY_ACCOUNT . '</a>'); ?></p>
 
 <?php
     }

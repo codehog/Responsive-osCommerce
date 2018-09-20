@@ -14,7 +14,7 @@
     var $code, $title, $description, $enabled;
 
 // class constructor
-    function chronopay() {
+    function __construct() {
       global $order;
 
       $this->signature = 'chronopay|chronopay|1.0|2.2';
@@ -23,12 +23,15 @@
       $this->title = MODULE_PAYMENT_CHRONOPAY_TEXT_TITLE;
       $this->public_title = MODULE_PAYMENT_CHRONOPAY_TEXT_PUBLIC_TITLE;
       $this->description = MODULE_PAYMENT_CHRONOPAY_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_PAYMENT_CHRONOPAY_SORT_ORDER;
-      $this->enabled = ((MODULE_PAYMENT_CHRONOPAY_STATUS == 'True') ? true : false);
-
-      if ((int)MODULE_PAYMENT_CHRONOPAY_PREPARE_ORDER_STATUS_ID > 0) {
-        $this->order_status = MODULE_PAYMENT_CHRONOPAY_PREPARE_ORDER_STATUS_ID;
-      }
+      
+      if ( defined('MODULE_PAYMENT_CHRONOPAY_STATUS') ) {
+        $this->sort_order = MODULE_PAYMENT_CHRONOPAY_SORT_ORDER;
+        $this->enabled = ((MODULE_PAYMENT_CHRONOPAY_STATUS == 'True') ? true : false);
+        
+        if ((int)MODULE_PAYMENT_CHRONOPAY_PREPARE_ORDER_STATUS_ID > 0) {
+          $this->order_status = MODULE_PAYMENT_CHRONOPAY_PREPARE_ORDER_STATUS_ID;
+        }
+      }      
 
       if (is_object($order)) $this->update_status();
 
@@ -131,8 +134,7 @@
         if ($insert_order == true) {
           $order_totals = array();
           if (is_array($order_total_modules->modules)) {
-            reset($order_total_modules->modules);
-            while (list(, $value) = each($order_total_modules->modules)) {
+            foreach($order_total_modules->modules as $value) {
               $class = substr($value, 0, strrpos($value, '.'));
               if ($GLOBALS[$class]->enabled) {
                 for ($i=0, $n=sizeof($GLOBALS[$class]->output); $i<$n; $i++) {
@@ -310,7 +312,7 @@
                                tep_draw_hidden_field('product_price_currency', $currency) .
                                tep_draw_hidden_field('cb_url', urlencode(tep_href_link('ext/modules/payment/chronopay/callback.php', '' , 'SSL', true, true, true))) .
                                tep_draw_hidden_field('cb_type', 'P') .
-                               tep_draw_hidden_field('decline_url', urlencode(tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'))) .
+                               tep_draw_hidden_field('decline_url', urlencode(tep_href_link('checkout_payment.php', '', 'SSL'))) .
                                tep_draw_hidden_field('language', $language_code) .
                                tep_draw_hidden_field('f_name', $order->billing['firstname']) .
                                tep_draw_hidden_field('s_name', $order->billing['lastname']) .
@@ -442,7 +444,7 @@
       $email_order = STORE_NAME . "\n" .
                      EMAIL_SEPARATOR . "\n" .
                      EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
-                     EMAIL_TEXT_INVOICE_URL . ' ' . tep_href_link(FILENAME_ACCOUNT_HISTORY_INFO, 'order_id=' . $order_id, 'SSL', false) . "\n" .
+                     EMAIL_TEXT_INVOICE_URL . ' ' . tep_href_link('account_history_info.php', 'order_id=' . $order_id, 'SSL', false) . "\n" .
                      EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
       if ($order->info['comments']) {
         $email_order .= tep_db_output($order->info['comments']) . "\n\n";
@@ -497,7 +499,7 @@
 
       tep_session_unregister('cart_ChronoPay_ID');
 
-      tep_redirect(tep_href_link(FILENAME_CHECKOUT_SUCCESS, '', 'SSL'));
+      tep_redirect(tep_href_link('checkout_success.php', '', 'SSL'));
     }
 
     function after_process() {

@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function bm_information() {
+    function __construct() {
       $this->title = MODULE_BOXES_INFORMATION_TITLE;
       $this->description = MODULE_BOXES_INFORMATION_DESCRIPTION;
 
@@ -34,7 +34,7 @@
       global $oscTemplate;
 
       ob_start();
-      include(DIR_WS_MODULES . 'boxes/templates/information.php');
+      include('includes/modules/boxes/templates/tpl_' . basename(__FILE__));
       $data = ob_get_clean();
 
       $oscTemplate->addBlock($data, $this->group);

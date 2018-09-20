@@ -14,16 +14,19 @@
     var $code, $title, $description, $icon, $enabled;
 
 // class constructor
-    function flat() {
+    function __construct() {
       global $order;
 
       $this->code = 'flat';
       $this->title = MODULE_SHIPPING_FLAT_TEXT_TITLE;
       $this->description = MODULE_SHIPPING_FLAT_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_SHIPPING_FLAT_SORT_ORDER;
-      $this->icon = '';
-      $this->tax_class = MODULE_SHIPPING_FLAT_TAX_CLASS;
-      $this->enabled = ((MODULE_SHIPPING_FLAT_STATUS == 'True') ? true : false);
+      
+      if ( defined('MODULE_SHIPPING_FLAT_STATUS') ) {
+        $this->sort_order = MODULE_SHIPPING_FLAT_SORT_ORDER;
+        $this->icon = '';
+        $this->tax_class = MODULE_SHIPPING_FLAT_TAX_CLASS;
+        $this->enabled = ((MODULE_SHIPPING_FLAT_STATUS == 'True') ? true : false);
+      }
 
       if ( ($this->enabled == true) && ((int)MODULE_SHIPPING_FLAT_ZONE > 0) ) {
         $check_flag = false;
@@ -58,7 +61,7 @@
         $this->quotes['tax'] = tep_get_tax_rate($this->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
       }
 
-      if (tep_not_null($this->icon)) $this->quotes['icon'] = tep_image($this->icon, $this->title);
+      if (tep_not_null($this->icon)) $this->quotes['icon'] = tep_image($this->icon, htmlspecialchars($this->title));
 
       return $this->quotes;
     }

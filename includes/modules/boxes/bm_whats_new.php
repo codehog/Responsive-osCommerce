@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function bm_whats_new() {
+    function __construct() {
       $this->title = MODULE_BOXES_WHATS_NEW_TITLE;
       $this->description = MODULE_BOXES_WHATS_NEW_DESCRIPTION;
 
@@ -45,7 +45,7 @@
         }
                  
         ob_start();
-        include(DIR_WS_MODULES . 'boxes/templates/whats_new.php');
+        include('includes/modules/boxes/templates/tpl_' . basename(__FILE__));
         $data = ob_get_clean();
 
         $oscTemplate->addBlock($data, $this->group);

@@ -14,7 +14,7 @@
     var $type = 'warning';
     var $has_doc = true;
 
-    function securityCheckExtended_version_check() {
+    function __construct() {
       global $language;
 
       include(DIR_FS_ADMIN . 'includes/languages/' . $language . '/modules/security_check/extended/version_check.php');
@@ -29,7 +29,7 @@
     }
 
     function getMessage() {
-      return '<a href="' . tep_href_link(FILENAME_VERSION_CHECK) . '">' . MODULE_SECURITY_CHECK_EXTENDED_VERSION_CHECK_ERROR . '</a>';
+      return '<a href="' . tep_href_link('version_check.php') . '">' . MODULE_SECURITY_CHECK_EXTENDED_VERSION_CHECK_ERROR . '</a>';
     }
   }
 ?>

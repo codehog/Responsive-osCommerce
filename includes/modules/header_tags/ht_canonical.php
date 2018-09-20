@@ -18,7 +18,7 @@
     var $sort_order;
     var $enabled = false;
 
-    function ht_canonical() {
+    function __construct() {
       $this->title = MODULE_HEADER_TAGS_CANONICAL_TITLE;
       $this->description = MODULE_HEADER_TAGS_CANONICAL_DESCRIPTION;
 
@@ -29,16 +29,36 @@
     }
 
     function execute() {
-      global $PHP_SELF, $HTTP_GET_VARS, $cPath, $oscTemplate;
-
-      if (basename($PHP_SELF) == FILENAME_PRODUCT_INFO) {
-        $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . (int)$HTTP_GET_VARS['products_id'], 'NONSSL', false) . '" />' . "\n", $this->group);
-      } elseif (basename($PHP_SELF) == FILENAME_DEFAULT) {
-        if (isset($cPath) && tep_not_null($cPath)) {
-          $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link(FILENAME_DEFAULT, 'cPath=' . $cPath, 'NONSSL', false) . '" />' . "\n", $this->group);
-        } elseif (isset($HTTP_GET_VARS['manufacturers_id']) && tep_not_null($HTTP_GET_VARS['manufacturers_id'])) {
-          $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link(FILENAME_DEFAULT, 'manufacturers_id=' . (int)$HTTP_GET_VARS['manufacturers_id'], 'NONSSL', false) . '" />' . "\n", $this->group);
-        }
+      global $PHP_SELF, $cPath, $oscTemplate, $category_depth;
+      global $current_category_id, $OSCOM_category;
+      
+      switch (basename($PHP_SELF)) {
+        case 'index.php':
+          if (isset($cPath) && tep_not_null($cPath) && ($current_category_id > 0) && ($category_depth != 'top')) {
+            $canonical = $OSCOM_category->buildBreadcrumb($current_category_id);
+           
+            $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link('index.php', 'view=all&cPath=' . $canonical, 'NONSSL', false) . '" />' . PHP_EOL, $this->group);
+          }
+          elseif (isset($_GET['manufacturers_id']) && tep_not_null($_GET['manufacturers_id'])) {
+            $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link('index.php', 'view=all&manufacturers_id=' . (int)$_GET['manufacturers_id'], 'NONSSL', false) . '" />' . PHP_EOL, $this->group);
+          }
+          else {
+            $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link('index.php', null, 'NONSSL', false) . '" />' . PHP_EOL, $this->group);
+          }
+        break;
+        
+        case 'product_info.php':
+          $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link('product_info.php', 'products_id=' . (int)$_GET['products_id'], 'NONSSL', false) . '" />' . PHP_EOL, $this->group);
+        break;
+        
+        case 'products_new.php':
+        case 'specials.php':
+          $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link($PHP_SELF, 'view=all', 'NONSSL', false) . '" />' . PHP_EOL, $this->group);
+        break;
+        
+        default: 
+          $oscTemplate->addBlock('<link rel="canonical" href="' . tep_href_link($PHP_SELF, '', 'NONSSL', false) . '" />' . PHP_EOL, $this->group);
+        break;
       }
     }
 

@@ -14,7 +14,7 @@
     var $code, $title, $description, $enabled;
 
 // class constructor
-    function ipayment_elv() {
+    function __construct() {
       global $order;
 
       $this->signature = 'ipayment|ipayment_elv|1.0|2.2';
@@ -24,18 +24,21 @@
       $this->title = MODULE_PAYMENT_IPAYMENT_ELV_TEXT_TITLE;
       $this->public_title = MODULE_PAYMENT_IPAYMENT_ELV_TEXT_PUBLIC_TITLE;
       $this->description = MODULE_PAYMENT_IPAYMENT_ELV_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_PAYMENT_IPAYMENT_ELV_SORT_ORDER;
-      $this->enabled = ((MODULE_PAYMENT_IPAYMENT_ELV_STATUS == 'True') ? true : false);
+      
+      if ( defined('MODULE_PAYMENT_IPAYMENT_ELV_STATUS') ) {
+        $this->sort_order = MODULE_PAYMENT_IPAYMENT_ELV_SORT_ORDER;
+        $this->enabled = ((MODULE_PAYMENT_IPAYMENT_ELV_STATUS == 'True') ? true : false);
 
-      if ((int)MODULE_PAYMENT_IPAYMENT_ELV_ORDER_STATUS_ID > 0) {
-        $this->order_status = MODULE_PAYMENT_IPAYMENT_ELV_ORDER_STATUS_ID;
+        if ((int)MODULE_PAYMENT_IPAYMENT_ELV_ORDER_STATUS_ID > 0) {
+          $this->order_status = MODULE_PAYMENT_IPAYMENT_ELV_ORDER_STATUS_ID;
+        }
+
+        $this->gateway_addresses = array('212.227.34.218', '212.227.34.219', '212.227.34.220');
+
+        if (is_object($order)) $this->update_status();
+
+        $this->form_action_url = 'https://ipayment.de/merchant/' . MODULE_PAYMENT_IPAYMENT_ELV_ID . '/processor/2.0/';
       }
-
-      $this->gateway_addresses = array('212.227.34.218', '212.227.34.219', '212.227.34.220');
-
-      if (is_object($order)) $this->update_status();
-
-      $this->form_action_url = 'https://ipayment.de/merchant/' . MODULE_PAYMENT_IPAYMENT_ELV_ID . '/processor/2.0/';
     }
 
 // class methods
@@ -118,8 +121,8 @@
                                tep_draw_hidden_field('addr_country', $order->billing['country']['iso_code_2']) .
                                tep_draw_hidden_field('addr_state', $zone_code) .
                                tep_draw_hidden_field('addr_telefon', $order->customer['telephone']) .
-                               tep_draw_hidden_field('redirect_url', tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL', true)) .
-                               tep_draw_hidden_field('silent_error_url', tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=' . $this->code, 'SSL', true)) .
+                               tep_draw_hidden_field('redirect_url', tep_href_link('checkout_process.php', '', 'SSL', true)) .
+                               tep_draw_hidden_field('silent_error_url', tep_href_link('checkout_payment.php', 'payment_error=' . $this->code, 'SSL', true)) .
                                tep_draw_hidden_field('hidden_trigger_url', tep_href_link('ext/modules/payment/ipayment/callback_elv.php', '', 'SSL', false)) .
                                tep_draw_hidden_field('client_name', 'oscommerce') .
                                tep_draw_hidden_field('client_version', $this->signature);
@@ -132,29 +135,29 @@
     }
 
     function before_process() {
-      global $HTTP_GET_VARS, $HTTP_SERVER_VARS, $order, $currency;
+      global $order, $currency;
 
-      if ($HTTP_GET_VARS['ret_errorcode'] != '0') {
-        tep_redirect(tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=' . $this->code . '&error=' . tep_output_string_protected($HTTP_GET_VARS['ret_errormsg'])));
+      if ($_GET['ret_errorcode'] != '0') {
+        tep_redirect(tep_href_link('checkout_payment.php', 'payment_error=' . $this->code . '&error=' . tep_output_string_protected($_GET['ret_errormsg'])));
       }
 
       if (tep_not_null(MODULE_PAYMENT_IPAYMENT_ELV_SECRET_HASH_PASSWORD)) {
         $pass = true;
 
 // verify ret_param_checksum
-        if ($HTTP_GET_VARS['ret_param_checksum'] != md5(MODULE_PAYMENT_IPAYMENT_ELV_USER_ID . ($this->format_raw($order->info['total']) * 100) . $currency . $HTTP_GET_VARS['ret_authcode'] . $HTTP_GET_VARS['ret_booknr'] . MODULE_PAYMENT_IPAYMENT_ELV_SECRET_HASH_PASSWORD)) {
+        if ($_GET['ret_param_checksum'] != md5(MODULE_PAYMENT_IPAYMENT_ELV_USER_ID . ($this->format_raw($order->info['total']) * 100) . $currency . $_GET['ret_authcode'] . $_GET['ret_booknr'] . MODULE_PAYMENT_IPAYMENT_ELV_SECRET_HASH_PASSWORD)) {
           $pass = false;
         }
 
 // verify ret_url_checksum
-        $url= 'http' . (ENABLE_SSL == true ? 's' : '') . '://' . $HTTP_SERVER_VARS['SERVER_NAME'] . $HTTP_SERVER_VARS['REQUEST_URI'];
+        $url= 'http' . (ENABLE_SSL == true ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $url_without_checksum = substr($url, 0, strpos($url, '&ret_url_checksum')+1);
-        if ($HTTP_GET_VARS['ret_url_checksum'] != md5($url_without_checksum . MODULE_PAYMENT_IPAYMENT_ELV_SECRET_HASH_PASSWORD)) {
+        if ($_GET['ret_url_checksum'] != md5($url_without_checksum . MODULE_PAYMENT_IPAYMENT_ELV_SECRET_HASH_PASSWORD)) {
           $pass = false;
         }
 
         if ($pass != true) {
-          tep_redirect(tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=' . $this->code));
+          tep_redirect(tep_href_link('checkout_payment.php', 'payment_error=' . $this->code));
         }
       }
 
@@ -166,10 +169,8 @@
     }
 
     function get_error() {
-      global $HTTP_GET_VARS;
-
       $error = array('title' => MODULE_PAYMENT_IPAYMENT_ELV_ERROR_HEADING,
-                     'error' => ((isset($HTTP_GET_VARS['error'])) ? stripslashes(urldecode($HTTP_GET_VARS['error'])) : MODULE_PAYMENT_IPAYMENT_ELV_ERROR_MESSAGE));
+                     'error' => ((isset($_GET['error'])) ? stripslashes(urldecode($_GET['error'])) : MODULE_PAYMENT_IPAYMENT_ELV_ERROR_MESSAGE));
 
       return $error;
     }
@@ -219,8 +220,6 @@
     }
 
     function sendDebugEmail($checksum_match = 0) {
-      global $HTTP_POST_VARS, $HTTP_GET_VARS;
-
       if (tep_not_null(MODULE_PAYMENT_IPAYMENT_ELV_DEBUG_EMAIL)) {
         $email_body = 'iPayment (ELV) Transaction' . "\n\n" .
                       'Date: ' . strftime(DATE_TIME_FORMAT) . "\n" .
@@ -244,8 +243,8 @@
         $email_body .= "\n\n" .
                        'POST REQUEST:' . "\n\n";
 
-        if (!empty($HTTP_POST_VARS)) {
-          foreach ($HTTP_POST_VARS as $key => $value) {
+        if (!empty($_POST)) {
+          foreach ($_POST as $key => $value) {
             $email_body .= $key . '=' . $value . "\n";
           }
         } else {
@@ -254,8 +253,8 @@
 
         $email_body .= "\n" . 'GET REQUEST:' . "\n\n";
 
-        if (!empty($HTTP_GET_VARS)) {
-          foreach ($HTTP_GET_VARS as $key => $value) {
+        if (!empty($_GET)) {
+          foreach ($_GET as $key => $value) {
             $email_body .= $key . '=' . $value . "\n";
           }
         } else {

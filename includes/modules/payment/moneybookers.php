@@ -19,7 +19,7 @@
     var $_payment_method_image = 'by_ewallet_90x45.gif';
 
 // class constructor
-    function moneybookers() {
+    function __construct() {
       global $order;
 
       $this->signature = 'moneybookers|moneybookers|1.0|2.3';
@@ -28,11 +28,14 @@
       $this->title = MODULE_PAYMENT_MONEYBOOKERS_TEXT_TITLE;
       $this->public_title = MODULE_PAYMENT_MONEYBOOKERS_TEXT_PUBLIC_TITLE;
       $this->description = MODULE_PAYMENT_MONEYBOOKERS_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_PAYMENT_MONEYBOOKERS_SORT_ORDER;
-      $this->enabled = ((MODULE_PAYMENT_MONEYBOOKERS_STATUS == 'True') ? true : false);
+      
+      if ( defined('MODULE_PAYMENT_MONEYBOOKERS_STATUS') ) {
+        $this->sort_order = MODULE_PAYMENT_MONEYBOOKERS_SORT_ORDER;
+        $this->enabled = ((MODULE_PAYMENT_MONEYBOOKERS_STATUS == 'True') ? true : false);
 
-      if ((int)MODULE_PAYMENT_MONEYBOOKERS_PREPARE_ORDER_STATUS_ID > 0) {
-        $this->order_status = MODULE_PAYMENT_MONEYBOOKERS_PREPARE_ORDER_STATUS_ID;
+        if ((int)MODULE_PAYMENT_MONEYBOOKERS_PREPARE_ORDER_STATUS_ID > 0) {
+          $this->order_status = MODULE_PAYMENT_MONEYBOOKERS_PREPARE_ORDER_STATUS_ID;
+        }
       }
 
       if (is_object($order)) $this->update_status();
@@ -94,7 +97,7 @@
       $this->_deletePreparing();
 
       return array('id' => $this->code,
-                   'module' => $this->public_title . (!empty($this->_payment_method_image) ? '<br />' . tep_image('ext/modules/payment/moneybookers/logos/' . $this->_payment_method_image, $this->public_title) : ''));
+                   'module' => $this->public_title . (!empty($this->_payment_method_image) ? '<br />' . tep_image('ext/modules/payment/moneybookers/logos/' . $this->_payment_method_image, htmlspecialchars($this->public_title)) : ''));
     }
 
     function pre_confirmation_check() {
@@ -141,8 +144,7 @@
       if ($insert_order == true) {
         $order_totals = array();
         if (is_array($order_total_modules->modules)) {
-          reset($order_total_modules->modules);
-          while (list(, $value) = each($order_total_modules->modules)) {
+          foreach($order_total_modules->modules as $value) {
             $class = substr($value, 0, strrpos($value, '.'));
             if ($GLOBALS[$class]->enabled) {
               for ($i=0, $n=sizeof($GLOBALS[$class]->output); $i<$n; $i++) {
@@ -285,10 +287,10 @@
         $parameters = array('pay_to_email' => MODULE_PAYMENT_MONEYBOOKERS_PAY_TO,
                             'recipient_description' => STORE_NAME,
                             'transaction_id' => substr($GLOBALS[$this->_mbcartID], strpos($GLOBALS[$this->_mbcartID], '-')+1),
-                            'return_url' => tep_href_link(FILENAME_CHECKOUT_PROCESS, 'osig=' . md5(MODULE_PAYMENT_MONEYBOOKERS_SECRET_WORD . $GLOBALS[$this->_mbcartID]), 'SSL'),
+                            'return_url' => tep_href_link('checkout_process.php', 'osig=' . md5(MODULE_PAYMENT_MONEYBOOKERS_SECRET_WORD . $GLOBALS[$this->_mbcartID]), 'SSL'),
                             'return_url_text' => MODULE_PAYMENT_MONEYBOOKERS_RETURN_TEXT,
                             'return_url_target' => 1,
-                            'cancel_url' => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
+                            'cancel_url' => tep_href_link('checkout_payment.php', '', 'SSL'),
                             'cancel_url_target' => 1,
                             'status_url' => tep_href_link('ext/modules/payment/moneybookers/callback.php', '', 'SSL', false, false),
                             'language' => MODULE_PAYMENT_MONEYBOOKERS_LANGUAGE_CODE,
@@ -323,8 +325,7 @@
 
         $params_string = '';
 
-        reset($parameters);
-        while (list($key, $value) = each($parameters)) {
+        foreach($parameters as $key => $value) {
           $params_string .= $key . '=' . urlencode($value) . '&';
         }
 
@@ -349,18 +350,18 @@
     }
 
     function before_process() {
-      global $HTTP_GET_VARS, $customer_id, $order, $order_totals, $sendto, $billto, $languages_id, $payment, $currencies, $cart;
+      global $customer_id, $order, $order_totals, $sendto, $billto, $languages_id, $payment, $currencies, $cart;
       global $$payment;
 
       $pass = false;
 
-      if (isset($HTTP_GET_VARS['transaction_id']) && isset($HTTP_GET_VARS['msid'])) {
-        if ($HTTP_GET_VARS['transaction_id'] == substr($GLOBALS[$this->_mbcartID], strpos($GLOBALS[$this->_mbcartID], '-')+1)) {
-          if ($HTTP_GET_VARS['msid'] == strtoupper(md5(MODULE_PAYMENT_MONEYBOOKERS_MERCHANT_ID . $HTTP_GET_VARS['transaction_id'] . strtoupper(md5(MODULE_PAYMENT_MONEYBOOKERS_SECRET_WORD))))) {
+      if (isset($_GET['transaction_id']) && isset($_GET['msid'])) {
+        if ($_GET['transaction_id'] == substr($GLOBALS[$this->_mbcartID], strpos($GLOBALS[$this->_mbcartID], '-')+1)) {
+          if ($_GET['msid'] == strtoupper(md5(MODULE_PAYMENT_MONEYBOOKERS_MERCHANT_ID . $_GET['transaction_id'] . strtoupper(md5(MODULE_PAYMENT_MONEYBOOKERS_SECRET_WORD))))) {
             $pass = true;
           }
         }
-      } elseif (isset($HTTP_GET_VARS['osig']) && ($HTTP_GET_VARS['osig'] == md5(MODULE_PAYMENT_MONEYBOOKERS_SECRET_WORD . $GLOBALS[$this->_mbcartID]))) {
+      } elseif (isset($_GET['osig']) && ($_GET['osig'] == md5(MODULE_PAYMENT_MONEYBOOKERS_SECRET_WORD . $GLOBALS[$this->_mbcartID]))) {
         $pass = true;
       }
 
@@ -475,7 +476,7 @@
         $email_order = STORE_NAME . "\n" .
                        EMAIL_SEPARATOR . "\n" .
                        EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
-                       EMAIL_TEXT_INVOICE_URL . ' ' . tep_href_link(FILENAME_ACCOUNT_HISTORY_INFO, 'order_id=' . $order_id, 'SSL', false) . "\n" .
+                       EMAIL_TEXT_INVOICE_URL . ' ' . tep_href_link('account_history_info.php', 'order_id=' . $order_id, 'SSL', false) . "\n" .
                        EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
         if ($order->info['comments']) {
           $email_order .= tep_db_output($order->info['comments']) . "\n\n";
@@ -530,9 +531,9 @@
 
         tep_session_unregister($this->_mbcartID);
 
-        tep_redirect(tep_href_link(FILENAME_CHECKOUT_SUCCESS, '', 'SSL'));
+        tep_redirect(tep_href_link('checkout_success.php', '', 'SSL'));
       } else {
-        tep_redirect(tep_href_link(FILENAME_SHOPPING_CART));
+        tep_redirect(tep_href_link('shopping_cart.php'));
       }
     }
 
@@ -553,9 +554,7 @@
     }
 
     function install() {
-      global $HTTP_GET_VARS;
-
-      if ( !isset($HTTP_GET_VARS['active']) || ($HTTP_GET_VARS['active'] != 'true') ) {
+      if ( !isset($_GET['active']) || ($_GET['active'] != 'true') ) {
         tep_redirect(tep_href_link('ext/modules/payment/moneybookers/activation.php', 'selected_box=modules&set=payment'));
       }
 
@@ -610,8 +609,8 @@
       }
 
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Moneybookers eWallet', 'MODULE_PAYMENT_MONEYBOOKERS_STATUS', 'False', 'Do you want to accept Moneybookers eWallet payments?', '6', '3', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
-      tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('E-Mail Address', 'MODULE_PAYMENT_MONEYBOOKERS_PAY_TO', '" . (isset($HTTP_GET_VARS['email']) ? $HTTP_GET_VARS['email'] : '') . "', 'The Moneybookers seller e-mail address to accept payments for', '6', '4', now())");
-      tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Merchant ID', 'MODULE_PAYMENT_MONEYBOOKERS_MERCHANT_ID', '" . (isset($HTTP_GET_VARS['custid']) ? $HTTP_GET_VARS['custid'] : '') . "', 'The Moneybookers merchant ID assigned to the seller e-mail address', '6', '4', now())");
+      tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('E-Mail Address', 'MODULE_PAYMENT_MONEYBOOKERS_PAY_TO', '" . (isset($_GET['email']) ? $_GET['email'] : '') . "', 'The Moneybookers seller e-mail address to accept payments for', '6', '4', now())");
+      tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Merchant ID', 'MODULE_PAYMENT_MONEYBOOKERS_MERCHANT_ID', '" . (isset($_GET['custid']) ? $_GET['custid'] : '') . "', 'The Moneybookers merchant ID assigned to the seller e-mail address', '6', '4', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Secret Word', 'MODULE_PAYMENT_MONEYBOOKERS_SECRET_WORD', '', 'The secret word to verify transactions with', '6', '4', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Store Logo Image', 'MODULE_PAYMENT_MONEYBOOKERS_STORE_IMAGE', '" . tep_catalog_href_link('images/' . STORE_LOGO, '', 'SSL') . "', 'The URL of the store logo image to display on the gateway transaction page. This must be served through HTTPS otherwise it will not be shown.', '6', '4', now())");
       tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('iFrame Presentation', 'MODULE_PAYMENT_MONEYBOOKERS_IFRAME', 'True', 'Show the Moneybookers payment pages through an iFrame?', '6', '3', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");

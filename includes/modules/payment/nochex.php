@@ -14,17 +14,20 @@
     var $code, $title, $description, $enabled;
 
 // class constructor
-    function nochex() {
+    function __construct() {
       global $order;
 
       $this->code = 'nochex';
       $this->title = MODULE_PAYMENT_NOCHEX_TEXT_TITLE;
       $this->description = MODULE_PAYMENT_NOCHEX_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_PAYMENT_NOCHEX_SORT_ORDER;
-      $this->enabled = ((MODULE_PAYMENT_NOCHEX_STATUS == 'True') ? true : false);
+      
+      if ( defined('MODULE_PAYMENT_NOCHEX_STATUS') ) {
+        $this->sort_order = MODULE_PAYMENT_NOCHEX_SORT_ORDER;
+        $this->enabled = ((MODULE_PAYMENT_NOCHEX_STATUS == 'True') ? true : false);
 
-      if ((int)MODULE_PAYMENT_NOCHEX_ORDER_STATUS_ID > 0) {
-        $this->order_status = MODULE_PAYMENT_NOCHEX_ORDER_STATUS_ID;
+        if ((int)MODULE_PAYMENT_NOCHEX_ORDER_STATUS_ID > 0) {
+          $this->order_status = MODULE_PAYMENT_NOCHEX_ORDER_STATUS_ID;
+        }
       }
 
       if (is_object($order)) $this->update_status();
@@ -79,8 +82,8 @@
                                tep_draw_hidden_field('email', MODULE_PAYMENT_NOCHEX_ID) .
                                tep_draw_hidden_field('amount', number_format($order->info['total'] * $currencies->currencies['GBP']['value'], $currencies->currencies['GBP']['decimal_places'])) .
                                tep_draw_hidden_field('ordernumber', $customer_id . '-' . date('Ymdhis')) .
-                               tep_draw_hidden_field('returnurl', tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL')) .
-                               tep_draw_hidden_field('cancel_return', tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'));
+                               tep_draw_hidden_field('returnurl', tep_href_link('checkout_process.php', '', 'SSL')) .
+                               tep_draw_hidden_field('cancel_return', tep_href_link('checkout_payment.php', '', 'SSL'));
 
       return $process_button_string;
     }

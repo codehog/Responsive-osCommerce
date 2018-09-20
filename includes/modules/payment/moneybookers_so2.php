@@ -23,7 +23,7 @@
     var $_payment_method_image = 'nordea.gif';
 
 // class constructor
-    function moneybookers_so2() {
+    function __construct() {
       global $order;
 
       $this->signature = 'moneybookers|moneybookers_so2|1.0|2.3';
@@ -32,11 +32,14 @@
       $this->title = MODULE_PAYMENT_MONEYBOOKERS_SO2_TEXT_TITLE;
       $this->public_title = MODULE_PAYMENT_MONEYBOOKERS_SO2_TEXT_PUBLIC_TITLE;
       $this->description = MODULE_PAYMENT_MONEYBOOKERS_SO2_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_PAYMENT_MONEYBOOKERS_SO2_SORT_ORDER;
-      $this->enabled = ((MODULE_PAYMENT_MONEYBOOKERS_SO2_STATUS == 'True') ? true : false);
+      
+      if ( defined('MODULE_PAYMENT_MONEYBOOKERS_SO2_STATUS') ) {
+        $this->sort_order = MODULE_PAYMENT_MONEYBOOKERS_SO2_SORT_ORDER;
+        $this->enabled = ((MODULE_PAYMENT_MONEYBOOKERS_SO2_STATUS == 'True') ? true : false);
 
-      if ((int)MODULE_PAYMENT_MONEYBOOKERS_SO2_PREPARE_ORDER_STATUS_ID > 0) {
-        $this->order_status = MODULE_PAYMENT_MONEYBOOKERS_SO2_PREPARE_ORDER_STATUS_ID;
+        if ((int)MODULE_PAYMENT_MONEYBOOKERS_SO2_PREPARE_ORDER_STATUS_ID > 0) {
+          $this->order_status = MODULE_PAYMENT_MONEYBOOKERS_SO2_PREPARE_ORDER_STATUS_ID;
+        }
       }
 
       if (is_object($order)) $this->update_status();
